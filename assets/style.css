@@ -13,17 +13,6 @@
   --purple-gray:  #78727f;
   --text-light:   #747c81;
   --white:        #ffffff;
-
-  --tag-glp1:        #110273;
-  --tag-emagre:      #f27f1b;
-  --tag-composicao:  #d9415d;
-  --tag-musculacao:  #0d0259;
-  --tag-suplem:      #f2c53d;
-  --tag-hormonal:    #624cab;
-  --tag-esporte:     #2a9d8f;
-  --tag-diretrizes:  #d9415d;
-  --tag-regulacao:   #2f2a53;
-  --tag-mercado:     #78727f;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -133,16 +122,9 @@ a:hover { color: var(--red); }
   background: var(--purple-gray);
   line-height: 1.2;
 }
-.tag[data-tag="glp-1"]               { background: var(--tag-glp1); }
-.tag[data-tag="emagrecimento"]       { background: var(--tag-emagre); }
-.tag[data-tag="composicao-corporal"] { background: var(--tag-composicao); }
-.tag[data-tag="musculacao"]          { background: var(--tag-musculacao); }
-.tag[data-tag="suplementacao"]       { background: var(--tag-suplem); color: var(--dark-text); }
-.tag[data-tag="hormonal"]            { background: var(--tag-hormonal); }
-.tag[data-tag="medicina-do-esporte"] { background: var(--tag-esporte); }
-.tag[data-tag="diretrizes"]          { background: var(--tag-diretrizes); }
-.tag[data-tag="regulacao"]           { background: var(--tag-regulacao); }
-.tag[data-tag="mercado"]             { background: var(--tag-mercado); }
+/* Regras .tag[data-tag=...] e .card__color[data-tag=...] são injetadas
+   dinamicamente a partir de config.tag_colors em feeds.yaml — veja
+   _build_tag_css() em render.py. */
 
 /* ===== FEATURED ARTICLE ================================================== */
 .featured { padding: 32px 0 64px; border-bottom: 1px solid var(--silver); }
@@ -271,16 +253,8 @@ a:hover { color: var(--red); }
   position: relative;
 }
 .card__color .badge { position: absolute; top: 14px; left: 14px; }
-.card__color--glp1       { background: linear-gradient(135deg, var(--tag-glp1), #4632d3); }
-.card__color--emagre     { background: linear-gradient(135deg, var(--tag-emagre), var(--gold)); }
-.card__color--composicao { background: linear-gradient(135deg, var(--tag-composicao), #a82d3f); }
-.card__color--musculacao { background: linear-gradient(135deg, var(--tag-musculacao), var(--purple)); }
-.card__color--suplem     { background: linear-gradient(135deg, var(--gold), #ffe28a); }
-.card__color--hormonal   { background: linear-gradient(135deg, var(--tag-hormonal), #8a6fc6); }
-.card__color--esporte    { background: linear-gradient(135deg, var(--tag-esporte), #4ec3b4); }
-.card__color--diretrizes { background: linear-gradient(135deg, var(--tag-diretrizes), var(--orange)); }
-.card__color--regulacao  { background: linear-gradient(135deg, var(--tag-regulacao), var(--purple-gray)); }
-.card__color--mercado    { background: linear-gradient(135deg, var(--tag-mercado), var(--silver)); }
+.card__color { background: linear-gradient(135deg, var(--purple-gray), var(--silver)); }
+/* Gradientes específicos por tag são injetados via _build_tag_css(). */
 .card__headline {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
@@ -510,3 +484,26 @@ a:hover { color: var(--red); }
   .archive li { grid-template-columns: 1fr; gap: 6px; }
   .section-head { flex-direction: column; gap: 8px; align-items: flex-start; }
 }
+
+
+/* --- per-tag rules (auto-generated from feeds.yaml > config.tag_colors) --- */
+.tag[data-tag="glp-1"] { background: #110273; color: var(--white); }
+.card__color[data-tag="glp-1"] { background: linear-gradient(135deg, #110273, #4632d3); }
+.tag[data-tag="emagrecimento"] { background: #f27f1b; color: var(--dark-text); }
+.card__color[data-tag="emagrecimento"] { background: linear-gradient(135deg, #f27f1b, #f2c53d); }
+.tag[data-tag="composicao-corporal"] { background: #d9415d; color: var(--white); }
+.card__color[data-tag="composicao-corporal"] { background: linear-gradient(135deg, #d9415d, #a82d3f); }
+.tag[data-tag="musculacao"] { background: #0d0259; color: var(--white); }
+.card__color[data-tag="musculacao"] { background: linear-gradient(135deg, #0d0259, #110273); }
+.tag[data-tag="suplementacao"] { background: #f2c53d; color: var(--dark-text); }
+.card__color[data-tag="suplementacao"] { background: linear-gradient(135deg, #f2c53d, #ffe28a); }
+.tag[data-tag="hormonal"] { background: #624cab; color: var(--white); }
+.card__color[data-tag="hormonal"] { background: linear-gradient(135deg, #624cab, #8a6fc6); }
+.tag[data-tag="medicina-do-esporte"] { background: #2a9d8f; color: var(--white); }
+.card__color[data-tag="medicina-do-esporte"] { background: linear-gradient(135deg, #2a9d8f, #4ec3b4); }
+.tag[data-tag="diretrizes"] { background: #d9415d; color: var(--white); }
+.card__color[data-tag="diretrizes"] { background: linear-gradient(135deg, #d9415d, #f27f1b); }
+.tag[data-tag="regulacao"] { background: #2f2a53; color: var(--white); }
+.card__color[data-tag="regulacao"] { background: linear-gradient(135deg, #2f2a53, #78727f); }
+.tag[data-tag="mercado"] { background: #78727f; color: var(--white); }
+.card__color[data-tag="mercado"] { background: linear-gradient(135deg, #78727f, #c0cad0); }
