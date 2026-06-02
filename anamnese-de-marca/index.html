@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anamnese de Marca · Do Feed ao Consultório</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bone:#F5F2EC; --bone-cool:#ECE8DD; --ink:#0A0E14;
+  --iron:#B33A3A; --gold:#9C7A3F; --sapphire:#1B2A4A;
+  --slate:#4A5160; --mist:#D4D0C8;
+  --serif:'Fraunces',Georgia,serif;
+  --sans:'Inter',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono','Courier New',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bone); color:var(--ink);
+  font-family:var(--sans); line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+.wrap{max-width:760px; margin:0 auto; padding:0 24px}
+
+/* progress bar */
+#progress-shell{position:sticky; top:0; z-index:50; background:var(--bone); border-bottom:1px solid var(--mist)}
+#progress-shell .wrap{display:flex; align-items:center; gap:16px; height:56px}
+.brandmark{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--slate); white-space:nowrap}
+.brandmark b{color:var(--iron); font-weight:700}
+#progress-track{flex:1; height:2px; background:var(--mist); position:relative; overflow:hidden}
+#progress-fill{position:absolute; left:0; top:0; height:100%; width:0; background:var(--iron); transition:width .4s cubic-bezier(.4,0,.2,1)}
+#progress-count{font-family:var(--mono); font-size:10px; letter-spacing:.1em; color:var(--slate); white-space:nowrap}
+
+/* screens */
+.screen{display:none; padding:56px 0 96px; animation:fade .5s ease both}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+
+/* intro */
+.intro-logo{display:block; height:48px; width:auto; margin-bottom:22px}
+.eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--iron); margin-bottom:18px}
+.intro-rule{width:38px; height:1px; background:var(--iron); margin-bottom:22px}
+h1.title{font-family:var(--serif); font-weight:800; font-size:clamp(40px,8vw,68px); line-height:.96; letter-spacing:-.03em; margin-bottom:20px}
+.lead{font-family:var(--serif); font-style:italic; font-weight:400; font-size:clamp(17px,2.4vw,21px); line-height:1.45; color:var(--slate); max-width:34em; margin-bottom:30px}
+.intro-body p{font-size:15px; color:var(--ink); margin-bottom:14px; max-width:40em}
+.intro-note{font-family:var(--mono); font-size:11px; letter-spacing:.04em; color:var(--slate); margin:26px 0 32px; padding-left:14px; border-left:2px solid var(--gold); line-height:1.7}
+.intro-map{margin:30px 0 8px}
+.intro-map .imlabel{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--slate); display:block; margin-bottom:12px}
+.intro-map ol{list-style:none; counter-reset:im}
+.intro-map li{counter-increment:im; font-size:13.5px; color:var(--slate); padding:7px 0 7px 34px; position:relative; line-height:1.45; border-bottom:1px solid var(--mist)}
+.intro-map li:last-child{border-bottom:none}
+.intro-map li::before{content:counter(im,decimal-leading-zero); position:absolute; left:0; top:7px; font-family:var(--mono); font-size:11px; color:var(--iron); font-weight:500}
+.intro-map li b{color:var(--ink); font-weight:600}
+
+/* step */
+.step-kicker{font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--iron); margin-bottom:14px}
+.step-kicker .of{color:var(--mist)}
+h2.q{font-family:var(--serif); font-weight:600; font-size:clamp(26px,4.6vw,38px); line-height:1.08; letter-spacing:-.02em; margin-bottom:16px}
+.help{font-size:15px; color:var(--slate); margin-bottom:8px; max-width:40em}
+
+/* principle callout */
+.principle{background:var(--bone-cool); border-left:3px solid var(--gold); padding:16px 18px; margin:24px 0; border-radius:0 4px 4px 0}
+.principle .plabel{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:7px}
+.principle p{font-family:var(--serif); font-style:italic; font-size:16px; line-height:1.5; color:var(--ink)}
+.principle p+p{margin-top:8px}
+
+.examples{margin:18px 0 6px}
+.examples .exlabel{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--slate); display:block; margin-bottom:8px}
+.examples ul{list-style:none}
+.examples li{font-size:13.5px; color:var(--slate); padding:5px 0 5px 18px; position:relative; line-height:1.5; border-bottom:1px solid var(--mist)}
+.examples li:last-child{border-bottom:none}
+.examples li::before{content:''; position:absolute; left:0; top:13px; width:5px; height:5px; background:var(--iron); border-radius:50%}
+
+/* inputs */
+.field{margin-top:24px}
+.field label.flabel{display:block; font-family:var(--sans); font-weight:600; font-size:13px; color:var(--ink); margin-bottom:8px}
+.dica{font-size:12.5px; color:var(--slate); line-height:1.5; margin:-2px 0 9px; padding-left:13px; border-left:2px solid var(--gold); max-width:40em}
+.dica b{color:var(--ink); font-weight:600}
+textarea,input[type=text]{
+  width:100%; font-family:var(--sans); font-size:15px; color:var(--ink);
+  background:#fff; border:1px solid var(--mist); border-radius:6px;
+  padding:13px 15px; resize:vertical; line-height:1.55; transition:border-color .2s,box-shadow .2s;
+}
+textarea{min-height:96px}
+textarea:focus,input[type=text]:focus{outline:none; border-color:var(--sapphire); box-shadow:0 0 0 3px rgba(27,42,74,.08)}
+textarea::placeholder,input::placeholder{color:#aeb3bd}
+.charhint{font-family:var(--mono); font-size:10px; color:var(--mist); text-align:right; margin-top:5px; letter-spacing:.04em; transition:color .2s}
+.charhint.ok{color:var(--gold)}
+
+/* choice options */
+.opts{display:flex; flex-direction:column; gap:10px; margin-top:8px}
+.opt{display:flex; align-items:flex-start; gap:12px; padding:14px 16px; background:#fff; border:1px solid var(--mist); border-radius:6px; cursor:pointer; transition:all .18s}
+.opt:hover{border-color:var(--slate)}
+.opt.sel{border-color:var(--sapphire); background:#fbfaf7; box-shadow:0 0 0 2px rgba(27,42,74,.1)}
+.opt .box{flex-shrink:0; width:18px; height:18px; border:1.5px solid var(--mist); margin-top:1px; display:flex; align-items:center; justify-content:center; transition:all .18s}
+.opt.multi .box{border-radius:4px}
+.opt.single .box{border-radius:50%}
+.opt.sel .box{border-color:var(--sapphire); background:var(--sapphire)}
+.opt.sel .box::after{content:''; width:7px; height:7px; background:#fff; border-radius:1px}
+.opt.single.sel .box::after{border-radius:50%}
+.opt .otext{font-size:14.5px; line-height:1.45}
+.opt .otext b{font-weight:600}
+.opt .ohint{display:block; font-size:12.5px; color:var(--slate); margin-top:3px}
+.multinote{font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:var(--slate); margin-top:10px; text-transform:uppercase}
+.multinote.warn{color:var(--iron)}
+
+/* nav */
+.nav{display:flex; justify-content:space-between; align-items:center; margin-top:40px; gap:16px}
+button{font-family:var(--sans); cursor:pointer; border:none; transition:all .2s}
+.btn-primary{background:var(--sapphire); color:var(--bone); font-weight:600; font-size:15px; padding:14px 30px; border-radius:6px; letter-spacing:.01em}
+.btn-primary:hover{background:#22345c}
+.btn-ghost{background:none; color:var(--slate); font-size:14px; font-weight:500; padding:14px 6px}
+.btn-ghost:hover{color:var(--ink)}
+.btn-ghost:disabled{opacity:0; pointer-events:none}
+
+/* result */
+.result-intro .help{margin-bottom:0}
+.doc{background:#fff; border:1px solid var(--mist); border-radius:8px; padding:44px 40px; margin-top:18px}
+.doc-head{border-bottom:2px solid var(--ink); padding-bottom:18px; margin-bottom:28px}
+.doc-head .dk{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--iron); margin-bottom:10px}
+.doc-head h3{font-family:var(--serif); font-weight:800; font-size:32px; line-height:1; letter-spacing:-.02em}
+.doc-head .who{font-family:var(--serif); font-style:italic; font-size:16px; color:var(--slate); margin-top:8px}
+.doc-head .dt{font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:var(--mist); margin-top:10px; text-transform:uppercase}
+
+/* synthesized declaration */
+.declar{background:var(--bone-cool); border-left:3px solid var(--iron); border-radius:0 6px 6px 0; padding:22px 24px; margin-bottom:34px}
+.declar .dlabel{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--iron); display:block; margin-bottom:12px}
+.declar p{font-family:var(--serif); font-size:18px; line-height:1.55; color:var(--ink)}
+.declar p+p{margin-top:10px}
+.declar .empty{font-style:italic; color:var(--slate); font-size:15px; font-family:var(--sans)}
+
+/* doc thematic groups */
+.doc-group{margin-bottom:30px}
+.doc-group>.gtitle{font-family:var(--mono); font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--sapphire); padding-bottom:8px; margin-bottom:16px; border-bottom:1px solid var(--mist)}
+.doc-sec{margin-bottom:18px}
+.doc-sec:last-child{margin-bottom:0}
+.doc-sec .sk{font-family:var(--sans); font-weight:600; font-size:12.5px; color:var(--slate); margin-bottom:5px}
+.doc-sec .sval{font-size:15px; line-height:1.6; color:var(--ink); white-space:pre-wrap}
+.doc-sec .sval.empty{color:var(--mist); font-style:italic}
+
+/* editorial plan */
+.edplan{display:grid; gap:12px; margin-top:4px}
+.edcard{border:1px solid var(--mist); border-radius:6px; padding:14px 16px; background:#fbfaf7}
+.edcard .ecname{font-family:var(--sans); font-weight:600; font-size:14px; color:var(--ink); margin-bottom:4px}
+.edcard .ecdesc{font-size:13px; color:var(--slate); line-height:1.5}
+.edcadence{font-family:var(--mono); font-size:11px; color:var(--gold); margin-top:12px; letter-spacing:.04em; line-height:1.6}
+
+/* voice ruler */
+.voice{display:grid; grid-template-columns:1fr; gap:0; margin-top:4px}
+.voice .vline{font-size:14px; line-height:1.55; color:var(--ink); padding:9px 0; border-bottom:1px solid var(--mist)}
+.voice .vline:last-child{border-bottom:none}
+.voice .vline b{font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--gold); display:block; margin-bottom:3px; font-weight:500}
+
+.reminders{background:var(--sapphire); color:var(--bone); border-radius:8px; padding:28px 30px; margin-top:24px}
+.reminders .rk{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#C9A55A; margin-bottom:14px}
+.reminders ul{list-style:none}
+.reminders li{font-size:14px; line-height:1.5; padding:9px 0 9px 20px; position:relative; border-bottom:1px solid rgba(245,242,236,.12)}
+.reminders li:last-child{border-bottom:none}
+.reminders li::before{content:''; position:absolute; left:0; top:16px; width:6px; height:6px; background:#C9A55A; border-radius:50%}
+
+/* summary block (copy-paste) */
+.summary{margin-top:24px}
+.summary .shead{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:8px}
+.summary .stitle{font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--slate)}
+.summary .sdesc{font-size:13px; color:var(--slate); margin-bottom:10px; max-width:42em; line-height:1.5}
+.btn-copy{background:var(--iron); color:#fff; font-size:12px; font-weight:600; padding:8px 16px; border-radius:5px; letter-spacing:.03em}
+.btn-copy:hover{background:#9c3030}
+.btn-copy.done{background:var(--gold)}
+#summary-text{width:100%; min-height:240px; font-family:var(--mono); font-size:12.5px; line-height:1.6; color:var(--ink); background:#fbfaf7; border:1px solid var(--mist); border-radius:6px; padding:16px; resize:vertical}
+
+.completion{font-family:var(--mono); font-size:11px; letter-spacing:.06em; color:var(--slate); margin-top:18px; padding:12px 0; border-top:1px solid var(--mist); border-bottom:1px solid var(--mist); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px}
+.completion b{color:var(--iron); font-weight:700}
+.completion .gaps{color:var(--gold)}
+
+.result-actions{display:flex; gap:12px; margin-top:28px; flex-wrap:wrap}
+.btn-line{background:none; border:1px solid var(--mist); color:var(--ink); font-size:14px; font-weight:500; padding:13px 24px; border-radius:6px}
+.btn-line:hover{border-color:var(--slate)}
+
+.foot{text-align:center; padding:34px 0 44px}
+.foot img{height:30px; width:auto; opacity:.92}
+.foot .foot-credit{font-family:var(--mono); font-size:10px; letter-spacing:.08em; color:var(--mist); text-transform:uppercase; margin-top:12px}
+
+@media print{
+  #progress-shell,.nav,.result-actions,.summary,.btn-copy,.foot,.result-intro,.completion{display:none!important}
+  body{background:#fff}
+  .doc,.reminders{border:none; padding:0; margin:0}
+  .doc{padding:0}
+  .declar{background:none; border-left:2px solid var(--ink); padding:8px 0 8px 18px}
+  .edcard{background:none; border:1px solid var(--mist)}
+  .reminders{background:none; color:var(--ink); border-top:1px solid var(--mist); padding-top:20px; margin-top:30px}
+  .reminders .rk{color:var(--gold)}
+  .reminders li{border-color:var(--mist)}
+  .reminders li::before{background:var(--gold)}
+  .reminders li{color:var(--ink)}
+  .screen{padding:0}
+  .doc-group{break-inside:avoid}
+}
+@media(max-width:600px){
+  .doc{padding:30px 22px}
+  .nav{flex-direction:row}
+  .btn-primary{padding:13px 22px; font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<div id="progress-shell">
+  <div class="wrap">
+    <span class="brandmark">Do Feed ao Consultório <b>·</b> Anamnese de Marca</span>
+    <div id="progress-track"><div id="progress-fill"></div></div>
+    <span id="progress-count">00 / 10</span>
+  </div>
+</div>
+
+<main class="wrap" id="app"></main>
+
+<div class="foot">
+  <img src="logo.png" alt="Do Feed ao Consultório">
+  <div class="foot-credit">Laboratório Estratégico</div>
+</div>
+
+<script>
+/* ---------- CONTEÚDO (extraído da Aula 1) ---------- */
+const STEPS = [
+  {
+    kicker:"Passo 01", key:"visao",
+    q:"Qual é a sua visão?",
+    help:"Marca não é o terno, o coque, a maquiagem ou um arquétipo. Arquétipo é acessório. A sua marca é a extensão da sua visão, do que você acredita. Comece por aqui.",
+    principle:{label:"Princípio da aula", text:["Quando está todo mundo fazendo tudo igual, já não é mais posicionamento. A sua marca e o seu conhecimento são as duas coisas que ninguém rouba de você."]},
+    fields:[
+      {key:"crenca", label:"O que você acredita sobre a sua área que vai contra o que a maioria faz ou diz?", type:"textarea", dica:"Escreva em primeira pessoa, como uma frase de fé na sua prática. Se a sua resposta serviria para qualquer colega do seu nicho, ela ainda está rasa. Afie até doer um pouco.", ph:"Ex: acredito que saúde vem antes de estética, e que resultado rápido demais costuma cobrar um preço depois."},
+    ],
+    examples:{label:"Referências da aula", items:[
+      "Luciana Seabra defende casa de análise independente, sem conflito de interesse.",
+      "Cristian Drummond, cardiologista e ciclista, se posiciona contra anabolizante.",
+      "Isabela Lacerda: corpo saudável acima de corpo de palito."
+    ]}
+  },
+  {
+    kicker:"Passo 02", key:"valores",
+    q:"Seus valores e contra o que você se posiciona",
+    help:"Valores aqui não são fé nem crença. São os princípios que guiam a sua prática. E todo posicionamento forte tem um inimigo concreto.",
+    principle:{label:"Princípio da aula", text:["Você sempre vai atrair as pessoas que compartilham a mesma visão de mundo que você. Nunca derrube ninguém do muro. A pessoa se joga para o lado que quer por conta própria."]},
+    fields:[
+      {key:"principios", label:"Quais princípios guiam o seu trabalho?", type:"textarea", dica:"Liste de dois a quatro princípios. Pense no que você nunca abre mão, mesmo quando dá mais trabalho ou custa um paciente.", ph:"Ex: clareza acima de jargão, prevenção acima de remédio, expectativa alinhada acima de promessa fácil."},
+      {key:"inimigo", label:"Contra qual prática, status ou conduta do seu mercado você se posiciona?", type:"textarea", dica:"O inimigo é uma prática, não uma pessoa. Aponte a conduta da moda que você considera errada, sem citar nome de colega.", ph:"Ex: contra a cultura de prometer resultado de atleta para quem não vive como atleta."}
+    ]
+  },
+  {
+    kicker:"Passo 03", key:"publico",
+    q:"Para quem você comunica?",
+    help:"Antes de pensar no conteúdo, defina o destinatário. Essa escolha muda tudo o que vem depois.",
+    principle:{label:"Princípio da aula", text:["O seu colega não paga você. A sua comunicação é para as pessoas que você serve, não para os pares que fiscalizam o seu trabalho."]},
+    fields:[
+      {key:"destinatario", type:"single", label:"Você comunica principalmente para:", options:[
+        {v:"publico", t:"O público final que eu atendo", h:"O paciente, ou quem indica o paciente. Resposta certa na maioria dos casos."},
+        {v:"colega", t:"O colega de profissão", h:"Só faz sentido se você vende para médicos, como cursos ou mentorias."}
+      ]},
+      {key:"paciente", label:"Descreva o seu paciente médio em poucas linhas.", type:"textarea", dica:"Descreva uma pessoa, não um grupo. Idade, momento de vida, o que já tentou e o que mais incomoda. Quanto mais específico, mais o conteúdo vira ímã.", ph:"Ex: mulher de 35 a 50 anos, que já tentou de tudo para emagrecer e vive no efeito sanfona."}
+    ]
+  },
+  {
+    kicker:"Passo 04", key:"mundo_ideal",
+    q:"O mundo ideal de quem te procura",
+    help:"O paciente chega buscando o mundo ideal dele. Ele chega buscando esperança. O seu papel é mostrar esse mundo ideal, sem prometer o impossível.",
+    principle:{label:"Princípio da aula", text:["Esperança é uma das maiores buscas que as pessoas têm. Quem te procura quer ficar livre do incômodo. Você é o caminho para o mundo ideal dela."]},
+    fields:[
+      {key:"sonho", label:"Qual é o mundo ideal de quem te procura? O que essa pessoa sonha alcançar?", type:"textarea", dica:"Escreva o sonho com as palavras do paciente, não com termo técnico. É a cena que ele imagina quando o problema acaba.", ph:"Ex: parar de engordar e emagrecer em ciclo, e finalmente confiar no espelho."}
+    ]
+  },
+  {
+    kicker:"Passo 05", key:"mundo_real",
+    q:"O mundo real, sem destruir o sonho",
+    help:"O mundo real do paciente quase sempre choca com o mundo ideal. A sua tarefa é trazer a realidade sem dar o não direto. Isso se chama bridging.",
+    principle:{label:"Princípio da aula", text:["Você nunca diz que o mundo ideal é impossível. Diz que é possível, e explica do que depende. Esse é o jeito de dizer não sem derrubar a esperança."]},
+    fields:[
+      {key:"choque", label:"Onde a expectativa do paciente choca com a realidade?", type:"textarea", dica:"Aponte a expectativa irreal que aparece de novo e de novo no consultório. É o ponto onde o sonho esbarra no esforço, no tempo ou na biologia.", ph:"Ex: ele quer resultado de atleta profissional sem ter a rotina de um atleta profissional."},
+      {key:"ponte", label:"Como você traz a realidade sem dar o não direto?", type:"textarea", dica:"A ponte sempre começa com um sim. Diga que é possível e explique do que depende. Esse é o seu jeito de dizer não sem derrubar a esperança.", ph:"Ex: é possível, e eu entrego o máximo do meu lado. O quanto você chega depende do esforço que conseguir colocar do seu."}
+    ]
+  },
+  {
+    kicker:"Passo 06", key:"diferenciacao",
+    q:"Sua diferenciação real",
+    help:"O que separa você da média do mercado de verdade. Pode ser a metodologia, o ambiente, a postura, a formação, ou a sua própria história.",
+    principle:{label:"Princípio da aula", text:["Guilherme é especialista em obesidade e, na outra ponta, passou quinze anos sendo obeso. A história pessoal que conecta vale mais que qualquer título na parede."]},
+    fields:[
+      {key:"diferencial", label:"O que te diferencia de verdade da média do mercado?", type:"textarea", dica:"Diferencial não é fazer bem o que todo mundo deveria fazer. É algo que o paciente sente na pele e não acha em qualquer consultório do seu nicho.", ph:"Ex: protocolo de atendimento leve, sem burocracia, com retorno rápido."},
+      {key:"autoridade", label:"Qual a sua autoridade técnica? O que você domina que poucos dominam?", type:"textarea", dica:"Aponte o assunto em que você consegue ir mais fundo que a média. Onde você lê o estudo na fonte enquanto os outros repetem o resumo.", ph:"Ex: estudo de drogas de emagrecimento desde antes de virarem moda."},
+      {key:"historia", label:"Tem alguma história pessoal que te conecta com o que você faz? (opcional)", type:"textarea", dica:"A história que conecta costuma ser a que você acha banal demais para contar. Se ela explica por que esse problema importa para você, ela vale ouro.", ph:"Ex: vivi na pele o problema que hoje trato nos meus pacientes."}
+    ]
+  },
+  {
+    kicker:"Passo 07", key:"show",
+    q:"Mostre, não conte",
+    help:"Show, don't tell. Em vez de afirmar quem você é, prove com o que você mostra. A Red Bull não diz que é sobre performance, ela só mostra performance o tempo todo.",
+    principle:{label:"Princípio da aula", text:["Você não precisa dizer que atende atletas. Se toda foto sua é num ambiente cercado de atletas, a marca já fica construída sozinha."]},
+    fields:[
+      {key:"prova", label:"Em vez de DIZER que você é isso, o que você pode MOSTRAR que comprova?", type:"textarea", dica:"Pense em cena, não em frase. Um ambiente recorrente, um bastidor, um ritual, um tipo de caso. O que a câmera capta sem você precisar narrar.", ph:"Ex: em vez de dizer que resolvo casos difíceis, levo um diário de bordo de casos anonimizados para a rede social."}
+    ]
+  },
+  {
+    kicker:"Passo 08", key:"promessa",
+    q:"Sua promessa central e sua linguagem",
+    help:"A promessa central é o mundo ideal que você mostra, de forma implícita. E a linguagem própria, os bordões que se repetem, gruda a marca na memória de quem te acompanha.",
+    principle:{label:"Princípio da aula", text:["A repetição de frases e expressões leva à construção de marca. Marie Krieger repete que excesso de vitamina é xixi caro. A frase fica colada na pessoa."]},
+    fields:[
+      {key:"promessa_central", label:"Qual é a sua promessa central? O mundo ideal que você mostra.", type:"textarea", dica:"A promessa é o sonho do paciente dito por você, com responsabilidade. Sem número milagroso, sem prazo de propaganda. O destino, não o atalho.", ph:"Ex: viver livre do incômodo, com um corpo que responde e uma rotina que cabe na vida real."},
+      {key:"bordao", label:"Que frase, bordão ou expressão pode virar a sua marca? (opcional)", type:"text", dica:"Bordão bom é curto, concreto e fácil de repetir. Pense numa frase que você já fala no consultório e que o paciente leva para casa.", ph:"Ex: a roupa do dia da prova é metade do resultado."},
+      {key:"tom", type:"single", label:"Qual o seu tom de voz predominante?", options:[
+        {v:"tecnico", t:"Técnico e estudioso", h:"Densidade, citação, paper. Como Wesley, o nerd que compartilha conhecimento."},
+        {v:"conversa", t:"Conversa irônica e leve", h:"Papo, não aula. Ironia sem peso. Como Isabela Lacerda."},
+        {v:"direto", t:"Direto e radical", h:"Posição firme, sem rodeio, assume o preço de incomodar."},
+        {v:"vulneravel", t:"Acolhedor e vulnerável", h:"Bastidor, processo, abertura. Conecta pela honestidade."}
+      ]}
+    ]
+  },
+  {
+    kicker:"Passo 09", key:"linhas",
+    q:"Suas linhas editoriais",
+    help:"A linha editorial segue eixos que se repetem. Escolha de três a quatro formatos que você vai rodar com constância. A repetição é o que constrói a marca.",
+    principle:{label:"Princípio da aula", text:["Se você falou de algo uma vez, três vezes, dez vezes e não funcionou, faltou repetição. Repetição, tempo e consistência constroem a marca."]},
+    fields:[
+      {key:"editoriais", type:"multi", max:4, label:"Escolha de 3 a 4 eixos que você vai repetir:", options:[
+        {v:"react", t:"React e análise de especialista", h:"Reagir a receitas, vídeos ou condutas da moda, com o seu olhar técnico."},
+        {v:"mito", t:"Quebra de mito", h:"Desmontar uma crença comum do seu nicho com evidência."},
+        {v:"diario", t:"Diário de bordo de casos", h:"Relatar casos anonimizados que mostram que você resolve o difícil."},
+        {v:"analise", t:"Análise profunda", h:"Mostrar por que algo funciona ou não, além do react raso."},
+        {v:"comparacao", t:"Comparações", h:"Comparar dois produtos, condutas ou caminhos lado a lado."},
+        {v:"causa", t:"Defesa de causa", h:"Posicionar-se a favor ou contra uma prática do mercado."},
+        {v:"educacional", t:"Conteúdo educacional com evidência", h:"Ensinar com base em estudo, sempre com uma moral no final."},
+        {v:"bastidor", t:"Vulnerabilidade e bastidores", h:"Mostrar o seu processo, o que é difícil, o que você aprende."}
+      ]}
+    ]
+  },
+  {
+    kicker:"Passo 10", key:"preco",
+    q:"O preço que você aceita pagar",
+    help:"Toda comunicação tem um preço. Posicionar-se afasta uns e atrai outros. Decidir qual desconforto você aceita é o que sustenta a sua marca quando a crítica chega.",
+    principle:{label:"Princípio da aula", text:["Charlatão não tem vergonha. Se o bom profissional não fala, ele libera o espaço para os outros falarem. A crítica do colega é parte do preço de ser lembrado."]},
+    fields:[
+      {key:"preco_aceito", label:"Qual crítica ou desconforto você está disposto a aceitar para se posicionar?", type:"textarea", dica:"Nomeie a crítica que mais te assusta. Quando você decide que aceita pagar esse preço, ela perde o poder de te calar.", ph:"Ex: aceito ser chamado de polêmico por um colega, em troca de chegar a milhares de pacientes que não me conheciam."}
+    ]
+  }
+];
+
+const TOM_LABEL={tecnico:"Técnico e estudioso",conversa:"Conversa irônica e leve",direto:"Direto e radical",vulneravel:"Acolhedor e vulnerável"};
+const EDIT_LABEL={react:"React e análise de especialista",mito:"Quebra de mito",diario:"Diário de bordo de casos",analise:"Análise profunda",comparacao:"Comparações",causa:"Defesa de causa",educacional:"Conteúdo educacional com evidência",bastidor:"Vulnerabilidade e bastidores"};
+const EDIT_DESC={
+  react:"Reaja a receitas, vídeos ou condutas da moda com o seu olhar técnico.",
+  mito:"Desmonte uma crença comum do seu nicho com evidência.",
+  diario:"Relate casos anonimizados que mostram que você resolve o difícil.",
+  analise:"Mostre por que algo funciona ou não, além do react raso.",
+  comparacao:"Compare dois produtos, condutas ou caminhos lado a lado.",
+  causa:"Posicione-se a favor ou contra uma prática do mercado.",
+  educacional:"Ensine com base em estudo, sempre com uma moral no final.",
+  bastidor:"Mostre o seu processo, o que é difícil, o que você aprende."
+};
+/* régua de voz derivada do tom escolhido */
+const TOM_GUIA={
+  tecnico:[
+    ["Densidade","Traga número, estudo e fonte. O paciente confia em quem mostra de onde tirou."],
+    ["Tradução","Use o termo técnico e explique logo depois, em uma linha."],
+    ["Evite","Soar arrogante. Conhecimento que humilha afasta. Ensine como quem divide, não como quem prova superioridade."]
+  ],
+  conversa:[
+    ["Leveza","Escreva como quem conversa, não como quem dá aula. Frase curta, ritmo de papo."],
+    ["Ironia","Uma sacada no meio do conteúdo técnico prende. Humor no assunto, nunca na pessoa."],
+    ["Evite","Diluir o conteúdo. Leve não é raso. Cada post ainda precisa entregar uma ideia que vale o tempo do paciente."]
+  ],
+  direto:[
+    ["Posição","Diga a sua conclusão na primeira linha. Sem aquecimento, sem rodeio."],
+    ["Firmeza","Assuma o lado. Conteúdo morno não é lembrado, e você já decidiu o preço que aceita pagar."],
+    ["Evite","Confundir firmeza com grosseria. Ataque a prática, respeite a pessoa."]
+  ],
+  vulneravel:[
+    ["Processo","Mostre o bastidor, o caso difícil, o que ainda te tira o sono. A honestidade conecta."],
+    ["Abertura","Conte o erro e o que aprendeu. O paciente confia em quem admite o limite."],
+    ["Evite","Virar desabafo sem destino. Toda abertura precisa terminar com uma direção para quem assiste."]
+  ]
+};
+
+/* ---------- MODO DEMO (autoplay para gravação de vídeo) ---------- */
+const QS=new URLSearchParams(location.search);
+const DEMO=QS.get('demo')==='1';
+const DEMO_LOOP=QS.get('loop')==='1';
+const SPEED=Math.max(0.3, parseFloat(QS.get('speed'))||1);
+
+/* ---------- ESTADO ---------- */
+let state={nome:""};
+let idx=-1; // -1 intro, 0..n-1 steps, n result
+const TOTAL=STEPS.length;
+const app=document.getElementById('app');
+const fill=document.getElementById('progress-fill');
+const count=document.getElementById('progress-count');
+
+if(!DEMO){
+  try{const saved=localStorage.getItem('anamnese_marca'); if(saved)state=JSON.parse(saved);}catch(e){}
+}
+function persist(){ if(DEMO) return; try{localStorage.setItem('anamnese_marca',JSON.stringify(state));}catch(e){} }
+
+function setProgress(){
+  let pct, lbl;
+  if(idx<0){pct=0; lbl="00 / "+pad(TOTAL);}
+  else if(idx>=TOTAL){pct=100; lbl=pad(TOTAL)+" / "+pad(TOTAL);}
+  else{pct=(idx/TOTAL)*100; lbl=pad(idx+1)+" / "+pad(TOTAL);}
+  fill.style.width=pct+"%"; count.textContent=lbl;
+}
+function pad(n){return String(n).padStart(2,'0');}
+
+/* ---------- RENDER ---------- */
+function render(){
+  setProgress(); window.scrollTo({top:0,behavior:'smooth'});
+  if(idx<0) return renderIntro();
+  if(idx>=TOTAL) return renderResult();
+  renderStep(STEPS[idx]);
+}
+
+function renderIntro(){
+  app.innerHTML=`
+  <section class="screen active">
+    <img class="intro-logo" src="logo.png" alt="Do Feed ao Consultório">
+    <div class="intro-rule"></div>
+    <h1 class="title">Anamnese<br>de Marca</h1>
+    <p class="lead">Dez passos para descobrir o seu posicionamento autêntico, do jeito que ninguém vai conseguir copiar.</p>
+    <div class="intro-body">
+      <p>Marca não é o terno que você usa nem o arquétipo que uma agência te vendeu. Marca é o reflexo da sua visão, construído por repetição ao longo do tempo.</p>
+      <p>Este exercício transforma o que você viu na Aula 1 em decisões concretas sobre a sua própria marca. Responda com calma. Não existe resposta certa, existe a sua.</p>
+    </div>
+    <div class="intro-map">
+      <span class="imlabel">O caminho dos dez passos</span>
+      <ol>
+        <li><b>Visão.</b> O que você acredita que vai contra a maioria.</li>
+        <li><b>Valores e inimigo.</b> O que guia a sua prática e contra o que você se posiciona.</li>
+        <li><b>Público.</b> Para quem você comunica de verdade.</li>
+        <li><b>Mundo ideal.</b> O que quem te procura sonha alcançar.</li>
+        <li><b>Mundo real.</b> Como trazer a realidade sem derrubar a esperança.</li>
+        <li><b>Diferenciação.</b> O que separa você da média do mercado.</li>
+        <li><b>Mostrar.</b> O que você prova sem precisar afirmar.</li>
+        <li><b>Promessa e linguagem.</b> O destino que você mostra e o seu tom.</li>
+        <li><b>Linhas editoriais.</b> Os eixos que você vai repetir.</li>
+        <li><b>O preço.</b> Qual crítica você aceita pagar para ser lembrado.</li>
+      </ol>
+    </div>
+    <div class="intro-note">Leva de 15 a 25 minutos. As respostas ficam salvas neste navegador.<br>No fim, você recebe a sua anamnese para guardar e um briefing pronto para gerar conteúdo.</div>
+    <div class="field">
+      <label class="flabel" for="nome">Seu nome (opcional)</label>
+      <input type="text" id="nome" placeholder="Ex: Dra. Mariana Alves" value="${esc(state.nome||'')}">
+    </div>
+    <div class="nav">
+      <span></span>
+      <button class="btn-primary" id="start">${hasAnyAnswer()?'Continuar de onde parei':'Começar a anamnese'}</button>
+    </div>
+  </section>`;
+  document.getElementById('nome').addEventListener('input',e=>{state.nome=e.target.value; persist();});
+  document.getElementById('start').onclick=()=>{idx=firstUnanswered(); render();};
+}
+
+function renderStep(s){
+  let html=`<section class="screen active">
+    <div class="step-kicker">${s.kicker} <span class="of">/ ${pad(TOTAL)}</span></div>
+    <h2 class="q">${s.q}</h2>
+    <p class="help">${s.help}</p>`;
+  if(s.principle){
+    html+=`<div class="principle"><span class="plabel">${s.principle.label}</span>${s.principle.text.map(t=>`<p>${t}</p>`).join('')}</div>`;
+  }
+  s.fields.forEach(f=>{
+    html+=`<div class="field">`;
+    if(f.type==='textarea'){
+      html+=`<label class="flabel" for="${f.key}">${f.label}</label>`;
+      if(f.dica) html+=`<p class="dica">${f.dica}</p>`;
+      html+=`<textarea id="${f.key}" placeholder="${esc(f.ph||'')}">${esc(state[f.key]||'')}</textarea>`;
+    } else if(f.type==='text'){
+      html+=`<label class="flabel" for="${f.key}">${f.label}</label>`;
+      if(f.dica) html+=`<p class="dica">${f.dica}</p>`;
+      html+=`<input type="text" id="${f.key}" placeholder="${esc(f.ph||'')}" value="${esc(state[f.key]||'')}">`;
+    } else if(f.type==='single'||f.type==='multi'){
+      html+=`<label class="flabel">${f.label}</label>`;
+      if(f.dica) html+=`<p class="dica">${f.dica}</p>`;
+      html+=`<div class="opts" data-key="${f.key}" data-type="${f.type}"${f.max?` data-max="${f.max}"`:''}>`;
+      const cur=state[f.key]||(f.type==='multi'?[]:'');
+      f.options.forEach(o=>{
+        const sel=f.type==='multi'?cur.includes(o.v):cur===o.v;
+        html+=`<div class="opt ${f.type} ${sel?'sel':''}" data-v="${o.v}">
+          <div class="box"></div>
+          <div class="otext"><b>${o.t}</b>${o.h?`<span class="ohint">${o.h}</span>`:''}</div>
+        </div>`;
+      });
+      html+=`</div>`;
+      if(f.type==='multi'){
+        const n=Array.isArray(cur)?cur.length:0;
+        html+=`<div class="multinote" data-note-for="${f.key}">${multiNoteText(n,f.max)}</div>`;
+      }
+    }
+    html+=`</div>`;
+  });
+  if(s.examples){
+    html+=`<div class="examples"><span class="exlabel">${s.examples.label}</span><ul>${s.examples.items.map(i=>`<li>${i}</li>`).join('')}</ul></div>`;
+  }
+  html+=`<div class="nav">
+      <button class="btn-ghost" id="back">← Voltar</button>
+      <button class="btn-primary" id="next">${idx===TOTAL-1?'Ver minha anamnese':'Avançar'}</button>
+    </div></section>`;
+  app.innerHTML=html;
+
+  s.fields.forEach(f=>{
+    if(f.type==='textarea'||f.type==='text'){
+      const el=document.getElementById(f.key);
+      el.addEventListener('input',e=>{state[f.key]=e.target.value; persist();});
+    }
+  });
+  app.querySelectorAll('.opts').forEach(grp=>{
+    const key=grp.dataset.key, type=grp.dataset.type, max=grp.dataset.max?parseInt(grp.dataset.max):null;
+    grp.querySelectorAll('.opt').forEach(opt=>{
+      opt.onclick=()=>{
+        const v=opt.dataset.v;
+        if(type==='single'){
+          state[key]=v;
+          grp.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o.dataset.v===v));
+        } else {
+          let arr=state[key]||[]; arr=Array.isArray(arr)?arr.slice():[];
+          if(arr.includes(v)){ arr=arr.filter(x=>x!==v); }
+          else { if(max && arr.length>=max){ return; } arr.push(v); }
+          state[key]=arr;
+          grp.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',arr.includes(o.dataset.v)));
+          const note=app.querySelector(`[data-note-for="${key}"]`);
+          if(note){ note.textContent=multiNoteText(arr.length,max); note.classList.toggle('warn',max&&arr.length>=max); }
+        }
+        persist();
+      };
+    });
+  });
+  document.getElementById('back').onclick=()=>{idx--; render();};
+  document.getElementById('next').onclick=()=>{idx++; render();};
+}
+
+function multiNoteText(n,max){
+  if(n===0) return "Selecione de 3 a 4 eixos.";
+  if(max && n>=max) return n+" de "+max+" selecionados. Limite recomendado atingido.";
+  if(n<3) return n+" selecionado(s). Escolha pelo menos 3 para ter constância.";
+  return n+" selecionados. Pode avançar.";
+}
+
+function renderResult(){
+  const nome=state.nome?state.nome:"";
+
+  /* ---- declaração sintetizada ---- */
+  const declar=buildDeclar();
+
+  /* ---- agrupamento temático do documento ---- */
+  const destinatarioTxt=state.destinatario==='colega'?'O colega de profissão':(state.destinatario==='publico'?'O público final que atendo':'');
+  const tomTxt=state.tom?TOM_LABEL[state.tom]:'';
+
+  const groups=[
+    {title:"Essência", rows:[
+      ["A minha visão",state.crenca],
+      ["Princípios que defendo",state.principios],
+      ["Contra o que me posiciono",state.inimigo]
+    ]},
+    {title:"Quem eu sirvo", rows:[
+      ["Para quem comunico",destinatarioTxt],
+      ["O meu paciente médio",state.paciente],
+      ["O mundo ideal de quem me procura",state.sonho],
+      ["Onde a realidade choca",state.choque],
+      ["A minha ponte, sem dar o não",state.ponte]
+    ]},
+    {title:"O que me separa da média", rows:[
+      ["A minha diferenciação real",state.diferencial],
+      ["A minha autoridade técnica",state.autoridade],
+      ["A minha história que conecta",state.historia],
+      ["O que mostro em vez de dizer",state.prova]
+    ]},
+    {title:"A minha mensagem", rows:[
+      ["A minha promessa central",state.promessa_central],
+      ["O meu bordão",state.bordao],
+      ["O meu tom de voz",tomTxt]
+    ]}
+  ];
+
+  const groupHtml=groups.map(g=>{
+    const rows=g.rows.map(r=>docRow(r[0],r[1])).join('');
+    return `<div class="doc-group"><div class="gtitle">${g.title}</div>${rows}</div>`;
+  }).join('');
+
+  /* ---- plano editorial ---- */
+  const eds=Array.isArray(state.editoriais)?state.editoriais:[];
+  let edHtml;
+  if(eds.length){
+    edHtml=`<div class="edplan">${eds.map(v=>`
+      <div class="edcard">
+        <div class="ecname">${EDIT_LABEL[v]||v}</div>
+        <div class="ecdesc">${EDIT_DESC[v]||''}</div>
+      </div>`).join('')}</div>
+      <div class="edcadence">Cadência: rode esses ${eds.length} eixos em rodízio, na ordem acima, semana após semana. A marca nasce da repetição constante de poucos eixos. Variar demais dilui o que você construiu.</div>`;
+  } else {
+    edHtml=`<div class="doc-sec"><div class="sval empty">Nenhum eixo escolhido ainda. Volte ao Passo 09 e escolha de 3 a 4.</div></div>`;
+  }
+
+  /* ---- régua de voz ---- */
+  let voiceHtml='';
+  if(state.tom && TOM_GUIA[state.tom]){
+    voiceHtml=`<div class="doc-group"><div class="gtitle">A minha régua de voz</div><div class="voice">${
+      TOM_GUIA[state.tom].map(v=>`<div class="vline"><b>${v[0]}</b>${v[1]}</div>`).join('')
+    }</div></div>`;
+  }
+
+  /* ---- completude ---- */
+  const comp=completeness();
+
+  app.innerHTML=`
+  <section class="screen active">
+    <div class="result-intro">
+      <div class="step-kicker" style="color:var(--gold)">Resultado</div>
+      <h2 class="q" style="margin-bottom:8px">A sua marca, em uma página</h2>
+      <p class="help">Esta é a sua anamnese consolidada. Guarde, imprima, e use como bússola toda vez que for produzir conteúdo.</p>
+    </div>
+
+    <div class="doc" id="doc">
+      <div class="doc-head">
+        <div class="dk">Anamnese de Marca · Do Feed ao Consultório</div>
+        <h3>Anamnese de Marca</h3>
+        ${nome?`<div class="who">${esc(nome)}</div>`:''}
+        <div class="dt">Documento de posicionamento</div>
+      </div>
+
+      <div class="declar">
+        <span class="dlabel">A minha declaração de posicionamento</span>
+        ${declar}
+      </div>
+
+      ${groupHtml}
+
+      <div class="doc-group"><div class="gtitle">O meu plano editorial</div>${edHtml}</div>
+
+      ${voiceHtml}
+
+      <div class="doc-group"><div class="gtitle">O preço que aceito pagar</div>${docRow("A crítica que aceito receber",state.preco_aceito)}</div>
+    </div>
+
+    <div class="reminders">
+      <div class="rk">Antes de sair, lembre-se</div>
+      <ul>
+        <li>Repetição, tempo e consistência constroem a marca. Postar dez vezes e parar não é amostra suficiente.</li>
+        <li>Engajamento não é receita. O que importa é a agenda lotada, não a curtida.</li>
+        <li>A internet é um jogo de fracasso. De cada cem pessoas que você impacta, uma ou duas viram cliente. Isso é normal.</li>
+        <li>Arquétipo é acessório. A sua marca é a sua visão repetida ao longo do tempo.</li>
+      </ul>
+    </div>
+
+    <div class="completion">
+      <span>Anamnese preenchida: <b>${comp.pct}%</b></span>
+      ${comp.missing.length?`<span class="gaps">Faltam: ${comp.missing.join(', ')}</span>`:`<span class="gaps">Tudo preenchido. Bom trabalho.</span>`}
+    </div>
+
+    <div class="summary">
+      <div class="shead">
+        <span class="stitle">Briefing para gerar conteúdo</span>
+        <button class="btn-copy" id="copybtn">Copiar briefing</button>
+      </div>
+      <p class="sdesc">Cole isto no ChatGPT, no Claude ou no Laboratório Criativo Pro. Ele carrega o seu posicionamento, o seu tom e os seus eixos, e já pede o conteúdo no formato certo.</p>
+      <textarea id="summary-text" readonly>${esc(buildSummary())}</textarea>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn-primary" onclick="window.print()">Imprimir ou salvar em PDF</button>
+      <button class="btn-line" id="editbtn">Revisar respostas</button>
+      <button class="btn-line" id="resetbtn">Recomeçar do zero</button>
+    </div>
+  </section>`;
+
+  document.getElementById('copybtn').onclick=function(){
+    const ta=document.getElementById('summary-text');
+    ta.select(); ta.setSelectionRange(0,99999);
+    navigator.clipboard.writeText(ta.value).then(()=>{
+      this.textContent='Copiado'; this.classList.add('done');
+      setTimeout(()=>{this.textContent='Copiar briefing'; this.classList.remove('done');},2000);
+    }).catch(()=>{document.execCommand('copy'); this.textContent='Copiado'; this.classList.add('done');});
+  };
+  document.getElementById('editbtn').onclick=()=>{idx=0; render();};
+  document.getElementById('resetbtn').onclick=()=>{
+    if(confirm('Isto apaga todas as respostas. Tem certeza?')){
+      state={nome:''}; persist(); idx=-1; render();
+    }
+  };
+}
+
+/* monta uma linha do documento */
+function docRow(label,val){
+  const empty=!val||(Array.isArray(val)&&!val.length);
+  return `<div class="doc-sec"><div class="sk">${label}</div>
+    <div class="sval ${empty?'empty':''}">${empty?'Não preenchido':esc(val)}</div></div>`;
+}
+
+/* declaração de posicionamento sintetizada a partir das respostas */
+function buildDeclar(){
+  const P=[];
+  const dest=state.destinatario==='colega'?'colegas de profissão':(state.destinatario==='publico'?'as pessoas que atendo':'');
+  if(state.crenca) P.push("Acredito que "+lc(state.crenca)+".");
+  if(state.paciente){
+    P.push("Comunico para "+lc(state.paciente)+".");
+  } else if(dest){
+    P.push("Comunico para "+dest+".");
+  }
+  if(state.sonho) P.push("Essa pessoa quer "+lc(state.sonho)+".");
+  if(state.promessa_central) P.push("A minha promessa é "+lc(state.promessa_central)+".");
+  if(state.diferencial) P.push("O que me separa da média: "+lc(state.diferencial)+".");
+  if(state.prova) P.push("Em vez de afirmar, eu mostro: "+lc(state.prova)+".");
+  if(state.inimigo) P.push("E me posiciono contra "+lc(state.inimigo)+".");
+  if(!P.length) return `<p class="empty">Preencha os passos para a sua declaração se montar sozinha aqui.</p>`;
+  /* agrupa em até dois parágrafos para leitura */
+  const meio=Math.ceil(P.length/2);
+  const p1=P.slice(0,meio).join(' ');
+  const p2=P.slice(meio).join(' ');
+  return `<p>${esc(p1)}</p>`+(p2?`<p>${esc(p2)}</p>`:'');
+}
+
+/* deixa a primeira letra minúscula para encaixar no meio da frase, sem cortar acrônimos */
+function lc(s){
+  s=String(s).trim().replace(/[.;]+$/,'');
+  if(!s) return s;
+  /* se começa com duas maiúsculas seguidas (sigla), preserva */
+  if(/^[A-ZÀ-Ý]{2}/.test(s)) return s;
+  return s.charAt(0).toLowerCase()+s.slice(1);
+}
+
+function completeness(){
+  const checks=[
+    ["visão",state.crenca],["valores",state.principios],["inimigo",state.inimigo],
+    ["público",state.destinatario],["paciente",state.paciente],["mundo ideal",state.sonho],
+    ["choque",state.choque],["ponte",state.ponte],["diferencial",state.diferencial],
+    ["autoridade",state.autoridade],["o que mostro",state.prova],["promessa",state.promessa_central],
+    ["tom",state.tom],["linhas editoriais",state.editoriais],["preço",state.preco_aceito]
+  ];
+  let filled=0; const missing=[];
+  checks.forEach(c=>{
+    const v=c[1]; const ok=v&&(!Array.isArray(v)||v.length);
+    if(ok) filled++; else missing.push(c[0]);
+  });
+  return {pct:Math.round(filled/checks.length*100), missing};
+}
+
+function buildSummary(){
+  const L=[];
+  L.push("CONTEXTO DE MARCA");
+  L.push("Use este briefing para gerar conteúdo alinhado ao meu posicionamento. Respeite a minha visão, o meu tom e os meus eixos editoriais.");
+  L.push("");
+  L.push("== QUEM EU SOU ==");
+  if(state.nome) L.push("Profissional: "+state.nome);
+  if(state.crenca) L.push("Visão: "+state.crenca);
+  if(state.principios) L.push("Princípios: "+state.principios);
+  if(state.inimigo) L.push("Me posiciono contra: "+state.inimigo);
+  L.push("");
+  L.push("== QUEM EU SIRVO ==");
+  const dest=state.destinatario==='colega'?'colega de profissão':(state.destinatario==='publico'?'público final que atendo':'');
+  if(dest) L.push("Comunico para: "+dest);
+  if(state.paciente) L.push("Paciente médio: "+state.paciente);
+  if(state.sonho) L.push("Mundo ideal do paciente: "+state.sonho);
+  if(state.choque) L.push("Onde a realidade choca: "+state.choque);
+  if(state.ponte) L.push("Minha ponte (bridging, sim seguido de do que depende): "+state.ponte);
+  L.push("");
+  L.push("== O QUE ME DIFERENCIA ==");
+  if(state.diferencial) L.push("Diferenciação real: "+state.diferencial);
+  if(state.autoridade) L.push("Autoridade técnica: "+state.autoridade);
+  if(state.historia) L.push("História que conecta: "+state.historia);
+  if(state.prova) L.push("Mostro em vez de dizer: "+state.prova);
+  L.push("");
+  L.push("== MINHA MENSAGEM ==");
+  if(state.promessa_central) L.push("Promessa central: "+state.promessa_central);
+  if(state.bordao) L.push("Bordão: "+state.bordao);
+  if(state.tom){
+    L.push("Tom de voz: "+TOM_LABEL[state.tom]);
+    if(TOM_GUIA[state.tom]) L.push("Régua de voz: "+TOM_GUIA[state.tom].map(v=>v[0]+" ("+v[1]+")").join(' | '));
+  }
+  if(state.preco_aceito) L.push("Preço que aceito pagar: "+state.preco_aceito);
+  L.push("");
+  L.push("== MEUS EIXOS EDITORIAIS ==");
+  if(state.editoriais&&state.editoriais.length){
+    state.editoriais.forEach(v=>{ L.push("- "+EDIT_LABEL[v]+": "+EDIT_DESC[v]); });
+  } else {
+    L.push("(nenhum eixo definido ainda)");
+  }
+  L.push("");
+  L.push("== TAREFA ==");
+  L.push("Gere ideias de conteúdo para Instagram dentro dos meus eixos editoriais acima. Para cada ideia, indique o eixo, um gancho de abertura e o ângulo. Mostre o mundo ideal do paciente sem prometer o impossível, sempre com um sim seguido do que depende.");
+  L.push("");
+  L.push("Regras de escrita obrigatórias: português do Brasil formal, sem travessão, sem ponto de exclamação, sem pergunta retórica abrindo parágrafo, sem o padrão nao e X e Y. Toda promessa precisa de número, prazo ou situação concreta. Parágrafos e frases curtos. Comece pelo impacto. Termine com direção, não com inspiração.");
+  return L.join("\n");
+}
+
+/* ---------- HELPERS ---------- */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function hasAnyAnswer(){return Object.keys(state).some(k=>k!=='nome'&&state[k]&&(!Array.isArray(state[k])||state[k].length));}
+function firstUnanswered(){
+  for(let i=0;i<STEPS.length;i++){
+    const f=STEPS[i].fields[0];
+    const v=state[f.key];
+    if(!v||(Array.isArray(v)&&!v.length)) return i;
+  }
+  return 0;
+}
+
+/* ---------- DRIVER DA DEMO ---------- */
+const DEMO_DATA={
+  nome:"Dra. Mariana Alves",
+  crenca:"Saúde vem antes de estética. Resultado rápido demais quase sempre cobra um preço lá na frente.",
+  principios:"Clareza acima de jargão. Prevenção acima de remédio. Expectativa alinhada acima de promessa fácil.",
+  inimigo:"A cultura de prometer corpo de atleta para quem não vive como atleta.",
+  destinatario:"publico",
+  paciente:"Mulher de 35 a 50 anos, que já tentou de tudo para emagrecer e vive no efeito sanfona.",
+  sonho:"Parar de viver em dieta e finalmente confiar no próprio espelho.",
+  choque:"Ela quer resultado de atleta sem ter a rotina de um atleta.",
+  ponte:"É possível, e eu entrego o máximo do meu lado. O quanto você chega depende do esforço que colocar do seu.",
+  diferencial:"Atendimento leve, sem burocracia, com retorno rápido entre as consultas.",
+  autoridade:"Estudo as drogas de emagrecimento desde antes de virarem moda.",
+  historia:"Já vivi na pele o efeito sanfona que hoje trato no consultório.",
+  prova:"Levo para o Instagram um diário de bordo de casos reais, anonimizados.",
+  promessa_central:"Viver livre do incômodo, com um corpo que responde e uma rotina que cabe na vida real.",
+  bordao:"O corpo cobra todo atalho, mais cedo ou mais tarde.",
+  tom:"direto",
+  editoriais:["mito","diario","educacional"],
+  preco_aceito:"Aceito ser chamada de polêmica por um colega, em troca de alcançar milhares de pacientes que não me conheciam."
+};
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms/SPEED));
+const jit=(base,spread)=>base+Math.floor(Math.random()*spread);
+
+async function typeInto(el,text){
+  el.focus();
+  el.value='';
+  el.dispatchEvent(new Event('input',{bubbles:true}));
+  for(const ch of String(text)){
+    el.value+=ch;
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+    el.scrollTop=el.scrollHeight;
+    await sleep(jit(14,12));
+  }
+  await sleep(jit(150,120));
+}
+
+async function clickOpt(grp,v){
+  const opt=[...grp.querySelectorAll('.opt')].find(o=>o.dataset.v===v);
+  if(!opt) return;
+  opt.scrollIntoView({behavior:'smooth',block:'center'});
+  await sleep(jit(320,160));
+  opt.click();
+  await sleep(jit(260,140));
+}
+
+async function fillField(f){
+  if(f.type==='textarea'||f.type==='text'){
+    const el=document.getElementById(f.key);
+    if(el){ el.scrollIntoView({behavior:'smooth',block:'center'}); await sleep(300); await typeInto(el,DEMO_DATA[f.key]||''); }
+  } else {
+    const grp=app.querySelector(`.opts[data-key="${f.key}"]`);
+    if(!grp) return;
+    const val=DEMO_DATA[f.key];
+    if(Array.isArray(val)){ for(const v of val){ await clickOpt(grp,v); } }
+    else { await clickOpt(grp,val); }
+  }
+}
+
+async function autoScrollThrough(){
+  const dur=9000, steps=130;
+  for(let i=0;i<=steps;i++){
+    const h=document.body.scrollHeight-window.innerHeight;
+    window.scrollTo(0,Math.max(0,h)*(i/steps));
+    await sleep(dur/steps);
+  }
+}
+
+async function runDemo(){
+  try{
+    await sleep(900);
+    const nameEl=document.getElementById('nome');
+    if(nameEl){ await typeInto(nameEl,DEMO_DATA.nome); await sleep(500); }
+    const start=document.getElementById('start'); if(start) start.click();
+    for(let i=0;i<STEPS.length;i++){
+      await sleep(jit(650,250));
+      for(const f of STEPS[i].fields){ await fillField(f); }
+      await sleep(jit(650,250));
+      const next=document.getElementById('next'); if(next) next.click();
+    }
+    await sleep(900);
+    await autoScrollThrough();
+    const copy=document.getElementById('copybtn');
+    if(copy){ copy.scrollIntoView({behavior:'smooth',block:'center'}); await sleep(700); copy.click(); await sleep(1600); }
+    window.__demoDone=true;
+    if(DEMO_LOOP){
+      await sleep(1800);
+      state={nome:''}; idx=-1; render(); await sleep(400); runDemo();
+    }
+  }catch(e){ console.warn('demo:',e); }
+}
+
+render();
+if(DEMO){ runDemo(); }
+</script>
+</body>
+</html>
